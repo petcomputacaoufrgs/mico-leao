@@ -14,22 +14,14 @@ def main():
     while True:
         
         event,values = window.read()
-        # print(window.AllKeysDict)
+       
         if sg.WINDOW_CLOSED == event:
             exit()
-        # if event == "0":
-        #     pass
-            # window[int(event)].update("X")
         
-        
-        # teste(actualBoard) #Tests if the evaluation process is working properly
-        
-        # while not Terminal(actualBoard.gameBoard):
-        # actualBoard.show()
         play = int(event[0])
         if actualBoard.IsValid(int(play)):
             actualBoard.Assing(int(play))
-            # actualBoard.show()
+            
             board = actualBoard.gameBoard[:]
             InitNode = NodeGame(board)
             if actualBoard.Evaluate(actualBoard.Value()) == 0:
@@ -49,16 +41,13 @@ def main():
                 for cells in actualBoard.gameBoard:
                     window[str(caller)].update(cells)
                     caller+=1
-                    # if actualBoard.Evaluate(actualBoard.Value()) != 0:
-                    #     if AfterGame(actualBoard, window) == False:
-                    #         exit()
+                    
             else:
                 if AfterGame(actualBoard, window) == False:
                     exit()
         else:
             sg.popup("Invalid Play")
-            # print("///////////////////////////////////////")
-        # actualBoard.show()
+            
   
 if __name__ == "__main__":
     main()
