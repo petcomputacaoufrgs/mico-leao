@@ -1,5 +1,7 @@
-import cv2 as cv 
-import numpy as np
+# Bibliotecas utilizadas
+import cv2 as cv  # OpenCV para manipulação de imagens
+import numpy as np 
+
 
 # leitura da base para DETECTAR faces    
 haar_cascade = cv.CascadeClassifier('haar_face.xml')
@@ -21,8 +23,7 @@ while True:
 
         label, confidence = face_recognizer.predict(faces_roi)
 
-        cv.putText(frame, str(people[label]), (20,20), cv.FONT_HERSHEY_COMPLEX, 1.0, (0,255,0), thickness=2)
-        cv.rectangle(frame, (x,y), (x+w, y+h), (0,255,0), thickness=2)
+        cv.putText(frame, str(people[label]), (x, y+h+25), cv.FONT_HERSHEY_COMPLEX, 1.0, (0,255,0), thickness=2)
 
     cv.imshow('Detected Faces', frame)   
 
