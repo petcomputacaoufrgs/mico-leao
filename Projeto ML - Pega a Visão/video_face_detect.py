@@ -7,7 +7,7 @@ import numpy as np
 haar_cascade = cv.CascadeClassifier('haar_face.xml')
 
 # Lista de pessoas que o modelo foi treinado
-people = ['Ben Afflek', 'Elton John','Jerry Seinfield', 'Madonna', 'Mindy Kaling', 'Laura Reis']
+people = ['Ben Afflek', 'Elton John','Jerry Seinfield', 'Madonna', 'Mindy Kaling', 'Laura do PET']
 face_recognizer = cv.face.LBPHFaceRecognizer_create() 
 face_recognizer.read('face_trained.yml')
 
@@ -19,12 +19,17 @@ while True:
 
     for (x,y,w,h) in faces_rect:
         faces_roi = gray[y:y+h, x:x+h]
-        cv.rectangle(frame, (x,y), (x+w, y+h), (0,255,0), thickness=2)
+        
 
         label, confidence = face_recognizer.predict(faces_roi)
         
-        cv.putText(frame, str(people[label]), (x, y+h+25), cv.FONT_HERSHEY_COMPLEX, 1.0, (0,255,0), thickness=2)
-        cv.putText(frame, str(int(confidence))+ '%', (x+w//2-20, y+h+50), cv.FONT_HERSHEY_COMPLEX, 1.0, (0,255,0), thickness=2)
+        if confidence > 50:
+            cv.rectangle(frame, (x,y), (x+w, y+h), (0,255,0), thickness=2)
+            cv.putText(frame, str(people[label]), (x, y+h+25), cv.FONT_HERSHEY_COMPLEX, 1.0, (0,255,0), thickness=2)
+            cv.putText(frame, str(int(confidence))+ '%', (x+w//2-20, y+h+50), cv.FONT_HERSHEY_COMPLEX, 1.0, (0,255,0), thickness=2)
+        else:
+            cv.rectangle(frame, (x,y), (x+w, y+h), (0,0,255), thickness=2)
+            cv.putText(frame, 'Pessoa desconhecida', (x, y+h+25), cv.FONT_HERSHEY_COMPLEX, 1.0, (0,0,255), thickness=2)
 
     cv.imshow('Detected Faces', frame)   
 
