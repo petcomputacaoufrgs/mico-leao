@@ -26,7 +26,7 @@ def video_face_detect():
 
             label, confidence = face_recognizer.predict(faces_roi)
             
-            if confidence > 20:
+            if confidence > 50:
                 cv.rectangle(frame, (x,y), (x+w, y+h), (0,255,0), thickness=2)
                 cv.putText(frame, str(people[label]), (x, y+h+25), cv.FONT_HERSHEY_COMPLEX, 1.0, (0,255,0), thickness=2)
                 cv.putText(frame, str(int(confidence))+ '%', (x+w//2-20, y+h+50), cv.FONT_HERSHEY_COMPLEX, 1.0, (0,255,0), thickness=2)
