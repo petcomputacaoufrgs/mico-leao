@@ -15,11 +15,11 @@ def saves_names():
     return pasta
     
 
-def saves_face():
+def saves_face(dest):
      # leitura da base para DETECTAR faces    
     haar_cascade = cv.CascadeClassifier('haar_face.xml')
     frameNumber=0
-    dest = saves_names()
+    
 
     capture = cv.VideoCapture(0)
     while True:

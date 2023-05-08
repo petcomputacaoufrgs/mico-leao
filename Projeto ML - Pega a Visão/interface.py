@@ -10,7 +10,8 @@ while True:
                 '1 - Camera\n'
                 '2 - Treinar modelo\n'
                 '3 - Salvar pessoa\n'
-                '4 - Sair\n')
+                '4 - Adcionar Imagens\n'
+                '5 - Sair\n')
 
     if opcao == '1':
         print('camera selecionada')
@@ -23,9 +24,19 @@ while True:
         
     elif opcao == '3':
         print("salvamento selecionado")
-        sf.saves_face()
+        dest = sf.saves_names()
+        sf.saves_face(dest)
     
     elif opcao == '4':
+        name = input('Digite o nome da pessoa:')
+        dest = r"Faces/train/"+name
+        people = ft.open_names()
+        if name in people: 
+            sf.saves_face(dest)
+        else:
+            print("Pessoa Não Econtrada.")
+
+    elif opcao == '5':
         break
     
     else:
