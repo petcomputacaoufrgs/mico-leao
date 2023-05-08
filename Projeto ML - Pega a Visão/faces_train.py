@@ -5,16 +5,6 @@ import numpy as np
 # Funções desse arquivo:
 # open_names()  # pega os nomes e retorna uma lista de nomes
 # create_train() # treina o modelo 
-# saves_names() # salva o nome da pessoa no arquivo e cria uma pasta
-
-# função que salva um novo nome no documento (colocar junto com o script do Tomás)
-def saves_names():
-    new_name = input('Digite um novo nome:')
-    # Abre o arquivo com os nomes
-    with open('names.txt', 'a', encoding="utf8") as file:
-        file.write(',')
-        file.write(new_name)
-    os.makedirs(r"Faces/train/"+new_name)
         
 # função que recarrega os nomes
 def open_names():

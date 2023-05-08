@@ -1,5 +1,6 @@
 import faces_train as ft # treinamento
 import video_face_detect as vfd # camera que detecta e reconhece
+import saves_face as sf
 
 
 # só colocando no prompt, depois fazer a interface bonitinha
@@ -20,9 +21,9 @@ while True:
         print('Iniciando treinamento, aguarde...')
         ft.create_train()
         
-
     elif opcao == '3':
-        print("FAZER OPCAO DE SALVAR PESSOA")
+        print("salvamento selecionado")
+        sf.saves_face()
     
     elif opcao == '4':
         break
