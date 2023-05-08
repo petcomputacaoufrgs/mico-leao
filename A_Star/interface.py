@@ -1,4 +1,25 @@
 import PySimpleGUI as sg
+from algorithm import Algorithm as alg
+
+def size() -> tuple():
+    sizeWindow = sg.Window('A Star', 
+                        [[sg.Slider(range=(0, 32), key='Sizex', orientation='horizontal', default_value=5, resolution=1, size=(10, 20)),
+                        sg.Slider(range=(0, 20), key='Sizey', orientation='horizontal', default_value=5, resolution=1, size=(10, 20))],
+                        [sg.Button('Ok', button_color=('white', 'black'), key='Ok')]], # create window
+                        #  size=(600, 100), # set window size
+                        resizable=True,
+                        grab_anywhere=False,
+                        element_justification='center') # set element justification to center
+    while True:
+        event, values = sizeWindow.read()
+        if event == sg.WIN_CLOSED:
+            exit()
+        if event == 'Ok':
+            sizex: int = int(values['Sizex'])
+            sizey: int = int(values['Sizey'])
+            sizeWindow.close()
+            return (sizex, sizey)
+        
 
 class interface:
     def __init__(self, height: int, width: int, colors: list):
@@ -8,6 +29,7 @@ class interface:
         self.maze = [[0 for i in range(width)] for j in range(height)] # create maze with 0's
         self.start = (-1, -1) # start position
         self.end = (-1, -1) # end position
+        self.time: float = 0.1 # time between each step
         buttons:list = [[sg.Button('', key= (i, j)) for i in range(self.width)] for j in range(self.height)] # create list of lists of buttons
         buttons.append([
             sg.Button('Exit', button_color=('white', 'black'), key='Exit'),
@@ -17,7 +39,8 @@ class interface:
             sg.Button('Path', button_color=(self.colors[0]), key='Path'),
             sg.Button('Wall', button_color=(self.colors[1]), key='Wall'),
             sg.Button('Start', button_color=(self.colors[2]), key='Start'),
-            sg.Button('End', button_color=(self.colors[3]), key='End')
+            sg.Button('End', button_color=(self.colors[3]), key='End'),
+            sg.Slider(range=(0, 1), key='Time', orientation='horizontal', default_value=0.1, resolution=0.01, size=(10, 20))
             ]) # add options button
 
         self.window = sg.Window('A Star', buttons, # create window
@@ -27,6 +50,9 @@ class interface:
                         grab_anywhere=False,
                         element_justification='center') # set element justification to center
         self.window.finalize() # finalize window
+    
+    def close(self) -> None:
+        self.window.close()
     
     def update_maze(self, event: tuple, option: str) -> None:
         x, y = event[0], event[1]
@@ -81,6 +107,7 @@ class interface:
             if event == 'Run':
                 self.maze[self.start[1]][self.start[0]] = 0 # set start and end to 0
                 self.maze[self.end[1]][self.end[0]] = 0 # set start and end to 0
+                self.time = values["Time"] # set time to value
                 return self.maze, self.start, self.end # return maze, start and end
             if event == 'Clear':
                 self.maze = [[0 for i in range(self.width)] for j in range(self.height)]
@@ -92,10 +119,42 @@ class interface:
             if event in ['Path', 'Wall', 'Start', 'End']:
                 option = event
             
-    def map_viewer(self, path: list(tuple())) -> None:
-        path = [(i[1], i[0]) for i in path] # reverse path
-        for node in path:
-            if node != self.start and node != self.end:
+    def map_viewer(self, maze, start: tuple, end: tuple) -> None:
+        path = None
+        for node in alg.astar(maze, start, end): # run algorithm
+            if node == None:
+                break
+            if node[1] == end:
+                path = node
+                break
+
+            if node[0] != start and node[0] != end:
+                self.window[node[0]].update(button_color = self.colors[5 if node[1] == "closed" else 6]) # update button color
+
+            if self.time != 0.0:
+                while True:
+                    event, values = self.window.read(timeout= 1000 * self.time)  # read the form
+                    if event in (sg.WIN_CLOSED, 'Exit'):  # if the X button clicked, just exit
+                        self.window.close() # close window
+                        exit()
+                    if event == sg.TIMEOUT_KEY: # if 1 second has passed
+                        break    
+            
+        if path == None:
+            sg.popup_auto_close("No path found", auto_close_duration=2, title="Error") # show popup
+        else:
+            if self.time != 0.0:
+                while True:
+                    event, values = self.window.read(timeout= 1000 * self.time)  # read the form
+                    if event in (sg.WIN_CLOSED, 'Exit'):  # if the X button clicked, just exit
+                        self.window.close() # close window
+                        exit()
+                    if event is sg.TIMEOUT_KEY: # if 1 second has passed
+                        break  
+
+            for node in alg.path(path[0], path[1]):
+                if node == start or node == end:
+                    continue
                 self.window[node].update(button_color = self.colors[4])
         
         while True:
