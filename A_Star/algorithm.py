@@ -22,19 +22,23 @@ class Algorithm:
         if y < len(maze) - 1 and maze[y + 1][x] == 0: # RIGHT
             neighbors.append((x, y + 1))
 
+        if x > 0 and y > 0 and maze[y - 1][x - 1] == 0: # UP-left
+            neighbors.append((x - 1, y - 1))
+        if x > 0 and y < len(maze) - 1 and maze[y + 1][x - 1] == 0: # UP-right
+            neighbors.append((x - 1, y + 1))
+        if x < len(maze[0]) - 1 and y > 0 and maze[y - 1][x + 1] == 0: # DOWN-left
+            neighbors.append((x + 1, y - 1))
+        if x < len(maze[0]) - 1 and y < len(maze) - 1 and maze[y + 1][x + 1] == 0: # DOWN-right
+            neighbors.append((x + 1, y + 1))
+
         for neighbor in neighbors:
             yield neighbor
 
     def spots(maze: list) -> tuple():
         """Returns a list of all the spots in the maze"""
-        spots = []
-        i = 0
-        for row in maze:
-            j = 0
-            for spot in row:
+        for i, row in enumerate(maze):
+            for j, spot in enumerate(row):
                 yield (j, i)
-                j += 1
-            i += 1
 
     def path(came_from: dict, current: tuple) -> tuple():
         """Draws the path from the start to the end"""
