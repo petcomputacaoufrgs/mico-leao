@@ -235,12 +235,14 @@ def Step(state,move):
                     index +=1
                         
                 actualBoard.gameBoard = InitNode.children[counter].gameBoard
-                return actualBoard,actualBoard.Evaluate(actualBoard.Value())
+                return InitNode,actualBoard,actualBoard.Evaluate(actualBoard.Value())
                     
             else:
-                return actualBoard,actualBoard.Evaluate(actualBoard.Value())   #terminou alguma coisa 
+                return InitNode,actualBoard,actualBoard.Evaluate(actualBoard.Value())   #terminou alguma coisa 
         else:
-            return state,0  #pop pop pop pop pop pop pop por pop pop pop pop
+            currentState = Game()
+            currentState.gameBoard = list(state)
+            return NodeGame(state),currentState,0  #pop pop pop pop pop pop pop por pop pop pop pop
     
 # def AfterGame(board, window):
 #     if telinha.PopupYesNo(TurnToString(board.Value()),title="Game Over") == "Yes":

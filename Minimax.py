@@ -2,7 +2,7 @@
 import PySimpleGUI as telinha
 from Processing import *
 from Drawing import *
-telinha.theme('Dark Amber') 
+
 
 
 

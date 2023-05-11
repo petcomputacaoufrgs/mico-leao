@@ -23,22 +23,56 @@ def DrawGame(game):
     boardState = list(" ")*9
 
 
-    child_layout = [[telinha.Text("child",key="text")]]
+    child_layout = [[telinha.Text("child",key="text",font=('Arial Bold', 18),size=(50,50),expand_x=True)]]
     child_window = telinha.Window("child display", child_layout, location=(40,40))
-    
+
 
     while True:
+
         event, value = StartWindow.read() 
         eventchild,valuechild = child_window.read(timeout=0)
-        child_window["text"].update("""{} | {} | {}
-         ---+---+---
-          {} | {} | {}
-         ---+---+---
-          {} | {} | {}""".format(*boardState))
+        #####
+    
+        rootGameBoard = Game()
+        rootGameBoard.gameBoard = boardState.copy()
+        if rootGameBoard.IsValid(int(event)) == True:
+            rootGameBoard.gameBoard[int(event)] = "X"
+        fatherNode = NodeGame(rootGameBoard.gameBoard)
+        #####
+        #child_window["text"].update("""
+         # {} | {} | {}
+         #---+---+---
+         # {} | {} | {}
+         #---+---+---
+         # {} | {} | {}""".format(*fatherNode.gameBoard))
+        
+        child_window["text"].update(fatherNode.gameBoard[0] + '|' + fatherNode.gameBoard[1] + '|' + fatherNode.gameBoard[2] + '\n' +
+                                    fatherNode.gameBoard[3] + '|' + fatherNode.gameBoard[4] + '|' + fatherNode.gameBoard[5] + '\n' +
+                                    fatherNode.gameBoard[6] + '|' + fatherNode.gameBoard[7] + '|' + fatherNode.gameBoard[8])
+        
+        # child_window["text"].update(visible=False)
+        # child_window.layout(child_layout)
+        
+
         if event in (telinha.WIN_CLOSED, 'Sair'):
             exit()
-    
-        gameNode, endFlag = Step(boardState,event)
+        ######
+        fatherNode,gameNode, endFlag = Step(boardState,event)
+        # child_window["text"].update(child_window["text"].get() + """\n
+        #   {} | {} | {}
+        #  ---+---+---
+        #   {} | {} | {}
+        #  ---+---+---
+        #   {} | {} | {}""".format(*fatherNode.children[0].gameBoard) + """{} | {} | {}
+        #                                                                  ---+---+---
+        #                                                                  {} | {} | {}
+        #                                                                  ---+---+---
+        #                                                                  {} | {} | {}
+        #.format(*fatherNode.children[0].gameBoard)) """ """
+
+        
+        
+        ######
         boardState = gameNode.gameBoard
         for itens in range(9):
             StartWindow[str(itens)].update(boardState[itens])
