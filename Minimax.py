@@ -3,8 +3,7 @@ import PySimpleGUI as telinha
 from Processing import *
 from Drawing import *
 telinha.theme('Dark Amber') 
-widthBUTTON = 30
-heightBUTTON = 15
+
 
 
 

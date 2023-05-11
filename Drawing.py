@@ -3,6 +3,7 @@ from Processing import *
 widthBUTTON = 30
 heightBUTTON = 15
 
+
 def AfterGame(board, window):
     if telinha.PopupYesNo(TurnToString(board.Value()),title="Game Over") == "Yes":
         board.Reset()

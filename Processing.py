@@ -1,6 +1,5 @@
 import PySimpleGUI as telinha
-widthBUTTON = 30
-heightBUTTON = 15
+
 
 def Result(position,gameIc, player):
     if player == False:
