@@ -30,16 +30,6 @@ class Board:
     def __repr__(self):
         for i in range(3):
             print(f"|{self.gameBoard[i*3]}|{self.gameBoard[(i*3)+1]}|{self.gameBoard[(i*3)+2]}|")
-
-    # def evaluate(self, value):
-    #     if value == 1:
-    #         print("You Lose")
-    #     elif value == -1:
-    #         print("You Win")
-    #     elif value == 0:
-    #         print("Draw")
-    #     else:
-    #         return 0
          
     def evaluateBoard(self, evaluated_player):
         evaluated_symbol = Board.PLAYER1_SYMBOL if evaluated_player == Board.PLAYER1 else Board.PLAYER2_SYMBOL
@@ -72,26 +62,6 @@ class Board:
             return True
         else:
             return False
-             
-    # def teste(self):
-    #     self.gameBoard = ["X","X","X",""," "," "," "," "," "]
-    #     self.Evaluate(self.Value())
-    #     self.gameBoard = ["O","O","O",""," "," "," "," "," "]
-    #     self.Evaluate(self.Value())
-    #     self.gameBoard = ["X"," "," ","X"," "," ","X"," "," "]
-    #     self.Evaluate(self.Value())
-    #     self.gameBoard = ["O"," "," ","O"," "," ","O"," "," "]
-    #     self.Evaluate(self.Value())
-    #     self.gameBoard = ["X"," "," "," ","X"," "," "," ","X"]
-    #     self.Evaluate(self.Value())
-    #     self.gameBoard = ["O"," "," "," ","O"," "," "," ","O"]
-    #     self.Evaluate(self.Value())
-    #     self.gameBoard = [" "," ","X"," ","X"," ","X"," "," "]
-    #     self.Evaluate(self.Value())
-    #     self.gameBoard = [" "," ","O"," ","O"," ","O"," "," "]
-    #     self.Evaluate(self.Value())
-    #     self.gameBoard = ["X","X","O","O","O","X","X","O","O"]
-    #     self.Evaluate(self.Value())
     
     def clear(self):
         self.gameBoard = list(" "*9)
