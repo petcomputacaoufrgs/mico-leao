@@ -5,13 +5,22 @@ import cv2 as cv
 from PIL import Image
 from datetime import datetime
 import csv
+import os
 from siamesenet import RecognizerNet, contrastiveLoss
 
+RECOGNIZER_MODEL_PATH = 'models\\recognizernet.pt'
+
 if __name__ == "__main__":
+    
+    is_model_loaded = False
     # Modelo reconhecedor
-    model = RecognizerNet()
-    model.load_state_dict(torch.load('models\\recognizernet.pt'))
-    model.eval()
+    if os.path.exists(RECOGNIZER_MODEL_PATH):
+        model = RecognizerNet()
+        model.load_state_dict(torch.load(RECOGNIZER_MODEL_PATH))
+        model.eval()
+        is_model_loaded = True
+    else:
+        print("WARNING: The recognizer model couldn't be loaded")
 
     # Haar cascade para detecção facial
     haar_features_path = '.\haar_face.xml'#os.path.dirname(os.path.realpath(__file__)) + '..\haar_face.xml'
@@ -95,6 +104,10 @@ if __name__ == "__main__":
         if key == ord("r"):
             if reference_image is None:
                 print('No reference image (press \'c\' to capture)')
+                continue
+            
+            if not is_model_loaded:
+                print('Cannot calculate dissimilarity: no model was loaded.')
                 continue
 
             for i, face in enumerate(detected_faces):            
