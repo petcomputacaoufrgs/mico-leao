@@ -22,7 +22,6 @@ class RecognizerNet(nn.Module):
         # Camadas utilizadas para aprender as relações entre faces
         self.linear_stack = nn.Sequential(
             nn.Linear(576, 1000),
-            nn.Tanh()
         )
 
     def forward_once(self, x):
