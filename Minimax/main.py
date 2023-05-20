@@ -1,12 +1,14 @@
-# Description: This program is a Tic Tac Toe game that uses the Minimax algorithm to play against the user.
-import PySimpleGUI as telinha
-from Processing import *
-from Drawing import *
-telinha.theme('Dark Amber') 
+import sys
+import gui
+from PySide6 import QtCore, QtWidgets, QtGui
+
 
 if __name__ == "__main__":
-   StartGame()
+   app = QtWidgets.QApplication([])
 
-        
-    
+   game = gui.MainWindow()
+   game.launch()
+   game.resize(800, 600)
+   game.show()
 
+   sys.exit(app.exec())

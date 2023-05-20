@@ -23,9 +23,9 @@ class Board:
     
     def registerMove(self, position, player):
         if player == Board.PLAYER1:
-            self.gameBoard[position] = 'X'
+            self.gameBoard[int(position)] = 'X'
         else:
-            self.gameBoard[position] = 'O'
+            self.gameBoard[int(position)] = 'O'
     
     def __repr__(self):
         for i in range(3):
@@ -88,7 +88,7 @@ class AIPlayer:
 
     # Gera árvore minimax a partir de tabuleiro
     def generateGameTree(self, initialBoard):
-        self.gameTree = MinimaxNode(initialBoard)
+        self.gameTree = MinimaxNode(initialBoard, self.player)
         self.gameTree.minimax(initialBoard, True, self.cur_depth)
 
     # Atualiza a raiz da árvores
@@ -138,7 +138,7 @@ class MinimaxNode:
         if self.score is not None:
             return self.score
 
-        self.generateValidMoves()
+        self.generateChildren()
 
         if isMax:
             best_value = -1000
