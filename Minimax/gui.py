@@ -141,7 +141,7 @@ class GameLogic:
         ### Board class from minimax.py
         self.board = minimax.Board()
         ### AI class from minimax.py
-        self.ai = minimax.AIPlayer(self.board.PLAYER1)
+        self.ai = minimax.AIPlayer(self.board.PLAYER2)
     
     ### Will register move if its a valid move           
     def registerPlayerMove(self, button, index): 

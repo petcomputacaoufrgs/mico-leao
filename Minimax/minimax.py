@@ -31,29 +31,36 @@ class Board:
         for i in range(3):
             print(f"|{self.gameBoard[i*3]}|{self.gameBoard[(i*3)+1]}|{self.gameBoard[(i*3)+2]}|")
          
-    def evaluateBoard(self, evaluated_player):
-        evaluated_symbol = Board.PLAYER1_SYMBOL if evaluated_player == Board.PLAYER1 else Board.PLAYER2_SYMBOL
-
-        def evaluate(symbol):
-            return 1 if symbol == evaluated_symbol else -1
-
-        for i in range(3):
-            if (self.gameBoard[(i*3)] != ' ') and (self.gameBoard[(i*3)] == self.gameBoard[(i*3)+1] == self.gameBoard[(i*3)+2]):
-                return evaluate(self.gameBoard[(i*3)])
-            
-            if (self.gameBoard[(i)] != ' ') and (self.gameBoard[i] == self.gameBoard[i+3] == self.gameBoard[i+6]):
-                return evaluate(self.gameBoard[i])
-            
-        if (self.gameBoard[0] != ' ') and (self.gameBoard[0] == self.gameBoard[4] == self.gameBoard[8]):
-            return evaluate(self.gameBoard[4])
-        elif (self.gameBoard[2] != ' ') and (self.gameBoard[2] == self.gameBoard[4] == self.gameBoard[6]):
-            return evaluate(self.gameBoard[4])
+    def evaluateBoard(self):
         
-
-        if " " not in self.gameBoard:
+        for i in range(3):
+            if self.gameBoard[(i*3)] == self.gameBoard[(i*3)+1] == self.gameBoard[(i*3)+2] == "O":
+                return 1
+            
+        for i in range(3):
+            if self.gameBoard[i] == self.gameBoard[i+3] == self.gameBoard[i+6] == "O":
+                return 1
+        if self.gameBoard[0] == self.gameBoard[4] == self.gameBoard[8] == "O":
+            return 1
+        elif self.gameBoard[2] == self.gameBoard[4] == self.gameBoard[6] == "O":
+            return 1
+        
+        for i in range(3):
+            if self.gameBoard[(i*3)] == self.gameBoard[(i*3)+1] == self.gameBoard[(i*3)+2] == "X":
+                return -1
+            
+        for i in range(3):
+            if self.gameBoard[i] == self.gameBoard[i+3] == self.gameBoard[i+6] == "X":
+                return -1
+        if self.gameBoard[0] == self.gameBoard[4] == self.gameBoard[8] == "X":
+            return -1
+        elif self.gameBoard[2] == self.gameBoard[4] == self.gameBoard[6] == "X":
+            return -1
+        
+        elif " " not in self.gameBoard:
             return 0
         else:
-            return None
+            return None 
          
     def isValidMove(self,position):
         if position < 0 or position > 8:
@@ -132,34 +139,37 @@ class MinimaxNode:
                 self.children.append(newNode)
 
     # Gera árvore minimax a partir deste nodo e obtém o valor da raiz
-    def minimax(self, isMax, depth=0, maxDepth=9):
-        self.score = self.gameBoard.evaluateBoard(self.player)
+    def minimax(self, curBoard, isMax, depth=0, maxDepth=9):
+        self.score = curBoard.evaluateBoard()
         
         if self.score is not None:
             return self.score
 
-        self.generateChildren()
+        if depth == maxDepth:
+            return self.score
 
+        self.generateChildren()
+        
         if isMax:
             best_value = -1000
-            new_best_value = None
+            #new_best_value = None
 
             for child in self.children:
-                new_value = self.minimax(child, not isMax, depth+1, maxDepth)
+                new_value = self.minimax(child.gameBoard, not isMax, depth+1, maxDepth)
                  
                 if new_value > best_value:
                     new_value = best_value
 
         else:
             best_value = 1000
-            new_best_value = None
+            #new_best_value = None
 
             for child in self.children:
-                new_value = self.minimax(child, not isMax, depth+1, maxDepth)
+                new_value = self.minimax(child.gameBoard, not isMax, depth+1, maxDepth)
                 if new_value < best_value:
                     new_value = best_value
 
-        self.score = new_best_value
-        return new_best_value
+        self.score = new_value
+        return new_value
 
 
