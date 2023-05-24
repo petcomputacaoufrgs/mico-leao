@@ -94,9 +94,9 @@ class AIPlayer:
         self.cur_depth = 0 if player == Board.PLAYER1 else 1
 
     # Gera árvore minimax a partir de tabuleiro
-    def generateGameTree(self, initialBoard):
+    def generateGameTree(self, initialBoard : Board):
         self.gameTree = MinimaxNode(initialBoard, self.player)
-        self.gameTree.minimax(initialBoard, True, self.cur_depth)
+        self.gameTree.minimax(True, self.cur_depth)
 
     # Atualiza a raiz da árvores
     def updateTreeRoot(self, newBoard):
@@ -123,7 +123,7 @@ class AIPlayer:
 
 
 class MinimaxNode:
-    def __init__(self, gameBoard, player) -> None:
+    def __init__(self, gameBoard : Board, player) -> None:
         self.gameBoard = gameBoard
         self.score = None
         self.children = []
@@ -139,8 +139,8 @@ class MinimaxNode:
                 self.children.append(newNode)
 
     # Gera árvore minimax a partir deste nodo e obtém o valor da raiz
-    def minimax(self, curBoard, isMax, depth=0, maxDepth=9):
-        self.score = curBoard.evaluateBoard()
+    def minimax(self, isMax, depth=0, maxDepth=9):
+        self.score = self.gameBoard.evaluateBoard()
         
         if self.score is not None:
             return self.score
@@ -149,27 +149,29 @@ class MinimaxNode:
             return self.score
 
         self.generateChildren()
+
+            
         
         if isMax:
             best_value = -1000
             #new_best_value = None
 
             for child in self.children:
-                new_value = self.minimax(child.gameBoard, not isMax, depth+1, maxDepth)
+                new_value = child.minimax(not isMax, depth+1, maxDepth)
                  
                 if new_value > best_value:
-                    new_value = best_value
+                    best_value = new_value
 
         else:
             best_value = 1000
             #new_best_value = None
 
             for child in self.children:
-                new_value = self.minimax(child.gameBoard, not isMax, depth+1, maxDepth)
+                new_value = child.minimax(not isMax, depth+1, maxDepth)
                 if new_value < best_value:
-                    new_value = best_value
+                    best_value = new_value
 
-        self.score = new_value
-        return new_value
+        self.score = best_value
+        return best_value
 
 

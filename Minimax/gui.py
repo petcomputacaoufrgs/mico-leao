@@ -84,7 +84,7 @@ class GameWindow(QtWidgets.QWidget):
         super().__init__()
         
         ### Everythig related to the implementation of the game is here
-        self.game = GameLogic()
+        self.logic = GameLogic()
         
         ### Dictionary to map each QPushButton to an index (from 0 to 8, since the game board is a list with 9 elements)
         self.buttons = {}
@@ -123,15 +123,17 @@ class GameWindow(QtWidgets.QWidget):
         index = self.buttons.get(button)
         
         ### Checking if move is valid
-        self.game.registerPlayerMove(button, index)
+        self.logic.registerPlayerMove(button, index)
         
         self.updateBoard()
         
     ### Update each button on the board
     def updateBoard(self):
+        self.logic.getAIMove()
+        
         for button in self.buttons:
             index = self.buttons.get(button)
-            button.setText(self.game.board.gameBoard[index])    
+            button.setText(self.logic.gameState.gameBoard[index])    
         
 ### Class coordinates game logic (from minimax.py)
 class GameLogic:
@@ -139,21 +141,17 @@ class GameLogic:
     def __init__(self):
         
         ### Board class from minimax.py
-        self.board = minimax.Board()
+        self.gameState = minimax.Board()
         ### AI class from minimax.py
-        self.ai = minimax.AIPlayer(self.board.PLAYER2)
+        self.ai = minimax.AIPlayer(self.gameState.PLAYER2)
     
     ### Will register move if its a valid move           
     def registerPlayerMove(self, button, index): 
          
-        if self.board.isValidMove(index): 
+        if self.gameState.isValidMove(index): 
             
-            self.board.registerMove(index, self.board.PLAYER1)
-            button.setText(self.board.PLAYER1_SYMBOL)
+            self.gameState.registerMove(index, self.gameState.PLAYER1)
+            button.setText(self.gameState.PLAYER1_SYMBOL)
             
-            self.getAIMove()
-    
-    ### AI move 
-    ### TODO: check minimax logic       
     def getAIMove(self):
-        self.ai.makePlay(self.board) 
+        self.gameState = self.ai.makePlay(self.gameState)
