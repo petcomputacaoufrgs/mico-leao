@@ -17,6 +17,7 @@ class MainWindow(QtWidgets.QWidget):
     
     ### Menu of the game
     def launch(self):
+        self.deleteCurrentLayout() 
         self.curWindow = GameMenu(self)
         self.setCurrentLayout()
         
@@ -75,6 +76,17 @@ class GameMenu(QtWidgets.QWidget):
     ### returns menu layout ready to go   
     def getLayout(self):
         return self.layout
+
+# class EndWindow(QtWidgets.QWidget):
+#     def __init__(self, parent):
+#         super().__init__()
+
+#         self.endItOrNot = False
+        
+#     @staticmethod
+#     def askDecision():
+        
+
     
      
       
@@ -83,6 +95,7 @@ class GameWindow(QtWidgets.QWidget):
     def __init__(self, parent):
         super().__init__()
         
+        self.setParent(parent)
         ### Everythig related to the implementation of the game is here
         self.logic = GameLogic()
         
@@ -124,16 +137,19 @@ class GameWindow(QtWidgets.QWidget):
         
         ### Checking if move is valid
         self.logic.registerPlayerMove(button, index)
-        
+
         self.updateBoard()
         
     ### Update each button on the board
     def updateBoard(self):
-        self.logic.getAIMove()
-        
         for button in self.buttons:
             index = self.buttons.get(button)
-            button.setText(self.logic.gameState.gameBoard[index])    
+            button.setText(self.logic.gameState.gameBoard[index])
+        
+        score = self.logic.gameState.evaluateBoard()
+        
+        if score != None:
+            self.parentWidget().launch()
         
 ### Class coordinates game logic (from minimax.py)
 class GameLogic:
@@ -151,7 +167,11 @@ class GameLogic:
         if self.gameState.isValidMove(index): 
             
             self.gameState.registerMove(index, self.gameState.PLAYER1)
-            button.setText(self.gameState.PLAYER1_SYMBOL)
             
+            if self.ai.gameTree is not None:
+                self.ai.updateTreeRoot(self.gameState)
+            
+            self.getAIMove()
+                   
     def getAIMove(self):
         self.gameState = self.ai.makePlay(self.gameState)

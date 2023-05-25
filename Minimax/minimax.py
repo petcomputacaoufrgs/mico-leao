@@ -117,7 +117,8 @@ class AIPlayer:
                 best_move = child
                 best_value = child.score
         
-        self.updateTreeRoot(best_move.gameBoard)
+        if best_move is not None:
+            self.updateTreeRoot(best_move.gameBoard)
         
         return self.gameTree.gameBoard
 
@@ -149,12 +150,9 @@ class MinimaxNode:
             return self.score
 
         self.generateChildren()
-
-            
-        
+  
         if isMax:
             best_value = -1000
-            #new_best_value = None
 
             for child in self.children:
                 new_value = child.minimax(not isMax, depth+1, maxDepth)
@@ -164,7 +162,6 @@ class MinimaxNode:
 
         else:
             best_value = 1000
-            #new_best_value = None
 
             for child in self.children:
                 new_value = child.minimax(not isMax, depth+1, maxDepth)
