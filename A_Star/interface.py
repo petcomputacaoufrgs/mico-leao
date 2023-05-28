@@ -5,7 +5,7 @@ def size() -> tuple():
     sizeWindow = sg.Window('A Star', 
                         [[sg.Slider(range=(0, 32), key='Sizex', orientation='horizontal', default_value=5, resolution=1, size=(10, 20)),
                         sg.Slider(range=(0, 20), key='Sizey', orientation='horizontal', default_value=5, resolution=1, size=(10, 20))],
-                        [sg.Button('Ok', button_color=('white', 'black'), key='Ok')]], # create window
+                        [sg.Button('Ok', button_color=('white', 'black'), key='Ok'), sg.Button('Load', button_color=('white', 'black'), key='Load')]], # create window
                         #  size=(600, 100), # set window size
                         resizable=True,
                         grab_anywhere=False,
@@ -18,24 +18,32 @@ def size() -> tuple():
             sizex: int = int(values['Sizex'])
             sizey: int = int(values['Sizey'])
             sizeWindow.close()
-            return (sizex, sizey)
+            return (sizex, sizey, None)
+        if event == 'Load':
+            sizeWindow.close()
+            return (-1, -1, sg.popup_get_file("Load", file_types=(("A Star", "*.astr"),)))
         
 
 class interface:
-    def __init__(self, height: int, width: int, colors: list):
-        self.height = height
-        self.width = width
+    def __init__(self, height: int, width: int, colors: list, path: str):
+        if path is not None:
+            self.loaded = self.load(path)
+        else:
+            self.loaded = False
+            self.height = height
+            self.width = width
+            self.maze = [[0 for i in range(width)] for j in range(height)] # create maze with 0's
+            self.start = (-1, -1) # start position
+            self.end = (-1, -1) # end position
+            
         self.colors = colors
-        self.maze = [[0 for i in range(width)] for j in range(height)] # create maze with 0's
-        self.start = (-1, -1) # start position
-        self.end = (-1, -1) # end position
         self.time: float = 0.1 # time between each step
-        buttons:list = [[sg.Button('', key= (i, j)) for i in range(self.width)] for j in range(self.height)] # create list of lists of buttons
+        buttons:list = [[sg.Button('', key= (i, j), button_color=self.colors[self.maze[j][i]]) for i in range(self.width)] for j in range(self.height)] # create list of lists of buttons
         buttons.append([
             sg.Button('Exit', button_color=('white', 'black'), key='Exit'),
-            sg.Button('New', button_color=('white', 'black'), key='New'),
             sg.Button('Run', button_color=('white', 'black'), key='Run'),
             sg.Button('Clear', button_color=('white', 'black'), key='Clear'),
+            sg.Button('Save', button_color=('white', 'black'), key='Save'),
             sg.Button('Path', button_color=(self.colors[0]), key='Path'),
             sg.Button('Wall', button_color=(self.colors[1]), key='Wall'),
             sg.Button('Start', button_color=(self.colors[2]), key='Start'),
@@ -50,6 +58,40 @@ class interface:
                         grab_anywhere=False,
                         element_justification='center') # set element justification to center
         self.window.finalize() # finalize window
+    
+    def save(self, name: str) -> bool:
+        place = name.rfind(".")
+        name = name + ".astr" if place == -1 else name[:place] + ".astr"
+        try:
+            with open(name, "wb") as file:
+                file.write(self.height.to_bytes(2, "big"))
+                file.write(self.width.to_bytes(2, "big"))
+                file.write(self.start[0].to_bytes(2, "big"))
+                file.write(self.start[1].to_bytes(2, "big"))
+                file.write(self.end[0].to_bytes(2, "big"))
+                file.write(self.end[1].to_bytes(2, "big"))                
+                for i in range(self.height):
+                    for j in range(self.width):
+                        file.write(self.maze[i][j].to_bytes(1, "big"))
+            return True
+        except:
+            sg.popup_error("Error saving file")
+            return False
+    
+    def load(self, name: str) -> bool:
+        place = name.rfind(".")
+        name = name + ".astr" if place == -1 else name[:place] + ".astr"
+        try:
+            with open(name, "rb") as file:
+                self.height = int.from_bytes(file.read(2), "big")
+                self.width = int.from_bytes(file.read(2), "big")
+                self.start = (int.from_bytes(file.read(2), "big"), int.from_bytes(file.read(2), "big"))
+                self.end = (int.from_bytes(file.read(2), "big"), int.from_bytes(file.read(2), "big"))
+                self.maze = [[int.from_bytes(file.read(1), "big") for i in range(self.width)] for j in range(self.height)]
+            return True
+        except:
+            sg.popup_error("Error loading file")
+            return False
     
     def close(self) -> None:
         self.window.close()
@@ -93,7 +135,8 @@ class interface:
         return
     
     def map_creator(self) -> tuple or None:
-        self.clear()
+        if not self.loaded:
+            self.clear()
         option = 'Path'
 
         while True:
@@ -116,6 +159,10 @@ class interface:
                 for i in range(self.height):
                     for j in range(self.width):
                         self.window[(j, i)].update(button_color = self.colors[self.maze[i][j]])
+            if event == 'Save':
+                name = sg.popup_get_file('Save', save_as=True, file_types=(("Astar files", "*.astr"),))
+                if name != None:
+                    self.save(name)
             if event in ['Path', 'Wall', 'Start', 'End']:
                 option = event
             
@@ -162,8 +209,6 @@ class interface:
             if event in (sg.WIN_CLOSED, 'Exit'):  # if the X button clicked, just exit
                 self.window.close() # close window
                 exit()
-            if event == 'New':
-                break 
     
     def clear(self):
         self.maze = [[0 for i in range(self.width)] for j in range(self.height)]
