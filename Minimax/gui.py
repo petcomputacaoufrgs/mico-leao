@@ -27,6 +27,11 @@ class MainWindow(QtWidgets.QWidget):
         self.curWindow = GameWindow(self)
         self.setCurrentLayout()
     
+    def endScreen(self, score):
+        self.deleteCurrentLayout()
+        self.curWindow = GameEnd(self, score)
+        self.setCurrentLayout()
+    
     ### Change Main Window layout
     def setCurrentLayout(self):
         self.curLayout = self.curWindow.getLayout()
@@ -77,18 +82,38 @@ class GameMenu(QtWidgets.QWidget):
     def getLayout(self):
         return self.layout
 
-# class EndWindow(QtWidgets.QWidget):
-#     def __init__(self, parent):
-#         super().__init__()
-
-#         self.endItOrNot = False
+class GameEnd(QtWidgets.QWidget):
+    def __init__(self, parent, score):
+        super().__init__()
         
-#     @staticmethod
-#     def askDecision():
+        self.setParent(parent)
+        self.layout = QtWidgets.QVBoxLayout()
+        winMessage = " "
+        match score:
+            
+            case 0:
+                winMessage = "Empate! :/"    
+            case 1:
+                winMessage = "Você perdeu! :("
+            case -1:
+                winMessage = "Você ganhou! :)"
         
-
-    
-     
+        self.mainTitle = QtWidgets.QLabel(winMessage, parent, alignment=QtCore.Qt.AlignCenter)
+        self.startButton = QtWidgets.QPushButton("Jogar de novo", parent)      
+        self.quitButton = QtWidgets.QPushButton("Sair", parent)
+        
+        self.mainTitle.setFont(QtGui.QFont('Times', 30))
+        
+        self.startButton.clicked.connect(parent.launch)
+        self.quitButton.clicked.connect(parent.closeWindow)    
+        
+        self.layout.addWidget(self.mainTitle)
+        self.layout.addWidget(self.startButton)
+        self.layout.addWidget(self.quitButton)
+        
+    def getLayout(self):
+        return self.layout
+        
       
 ### Coordinates game window
 class GameWindow(QtWidgets.QWidget):
@@ -149,7 +174,7 @@ class GameWindow(QtWidgets.QWidget):
         score = self.logic.gameState.evaluateBoard()
         
         if score != None:
-            self.parentWidget().launch()
+            self.parentWidget().endScreen(score)
         
 ### Class coordinates game logic (from minimax.py)
 class GameLogic:
