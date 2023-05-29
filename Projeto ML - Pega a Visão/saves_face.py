@@ -1,6 +1,6 @@
+
 import os
 import cv2 as cv
-import faces_train as ft
 
 # função que salva um novo nome no documento e cria uma pasta retorna a direção da pasta criada
 def saves_names():
@@ -13,7 +13,6 @@ def saves_names():
     os.makedirs(pasta)
     
     return pasta
-    
 
 def saves_face(dest):
      # leitura da base para DETECTAR faces    
@@ -44,6 +43,4 @@ def saves_face(dest):
         if cv.waitKey(20) & 0xFF == ord('d'):
             break
 
-    capture.release()
-    cv.destroyallWindows()
-    cv.waitKey(0)
+  
