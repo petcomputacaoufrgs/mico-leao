@@ -186,6 +186,15 @@ class interface:
                         exit()
                     if event == sg.TIMEOUT_KEY: # if 1 second has passed
                         break    
+                    if event is "Clear":
+                        self.clear()
+                        return
+                    if event == 'Save':
+                        name = sg.popup_get_file('Save', save_as=True, file_types=(("Astar files", "*.astr"),))
+                        if name != None:
+                            self.maze[self.start[1]][self.start[0]] = 2 # set to 0
+                            self.maze[self.end[1]][self.end[0]] = 3 # set to 0
+                            self.save(name)
             
         if path == None:
             sg.popup_auto_close("No path found", auto_close_duration=2, title="Error") # show popup
@@ -198,6 +207,15 @@ class interface:
                         exit()
                     if event is sg.TIMEOUT_KEY: # if 1 second has passed
                         break  
+                    if event is "Clear":
+                        self.clear()
+                        return
+                    if event == 'Save':
+                        name = sg.popup_get_file('Save', save_as=True, file_types=(("Astar files", "*.astr"),))
+                        if name != None:
+                            self.maze[self.start[1]][self.start[0]] = 2 # set to 0
+                            self.maze[self.end[1]][self.end[0]] = 3 # set to 0
+                            self.save(name)
 
             for node in alg.path(path[0], path[1]):
                 if node == start or node == end:
@@ -209,6 +227,15 @@ class interface:
             if event in (sg.WIN_CLOSED, 'Exit'):  # if the X button clicked, just exit
                 self.window.close() # close window
                 exit()
+            if event is "Clear":
+                    self.clear()
+                    return
+            if event == 'Save':
+                name = sg.popup_get_file('Save', save_as=True, file_types=(("Astar files", "*.astr"),))
+                if name != None:
+                    self.maze[self.start[1]][self.start[0]] = 2 # set to 0
+                    self.maze[self.end[1]][self.end[0]] = 3 # set to 0
+                    self.save(name)
     
     def clear(self):
         self.maze = [[0 for i in range(self.width)] for j in range(self.height)]
