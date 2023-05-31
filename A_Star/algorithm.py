@@ -8,7 +8,7 @@ class Algorithm:
         x2, y2 = p2
         return abs(x1 - x2) + abs(y1 - y2)
 
-    def neighbors(maze: list, current: tuple) -> list(tuple()):
+    def neighbors(maze: list, current: tuple, diagonal: bool) -> list(tuple()):
         """Returns the neighbors of the current node"""
         x, y = current
         neighbors = []
@@ -22,14 +22,15 @@ class Algorithm:
         if y < len(maze) - 1 and maze[y + 1][x] == 0: # RIGHT
             neighbors.append((x, y + 1))
 
-        if x > 0 and y > 0 and maze[y - 1][x - 1] == 0: # UP-left
-            neighbors.append((x - 1, y - 1))
-        if x > 0 and y < len(maze) - 1 and maze[y + 1][x - 1] == 0: # UP-right
-            neighbors.append((x - 1, y + 1))
-        if x < len(maze[0]) - 1 and y > 0 and maze[y - 1][x + 1] == 0: # DOWN-left
-            neighbors.append((x + 1, y - 1))
-        if x < len(maze[0]) - 1 and y < len(maze) - 1 and maze[y + 1][x + 1] == 0: # DOWN-right
-            neighbors.append((x + 1, y + 1))
+        if diagonal:
+            if x > 0 and y > 0 and maze[y - 1][x - 1] == 0: # UP-left
+                neighbors.append((x - 1, y - 1))
+            if x > 0 and y < len(maze) - 1 and maze[y + 1][x - 1] == 0: # UP-right
+                neighbors.append((x - 1, y + 1))
+            if x < len(maze[0]) - 1 and y > 0 and maze[y - 1][x + 1] == 0: # DOWN-left
+                neighbors.append((x + 1, y - 1))
+            if x < len(maze[0]) - 1 and y < len(maze) - 1 and maze[y + 1][x + 1] == 0: # DOWN-right
+                neighbors.append((x + 1, y + 1))
 
         for neighbor in neighbors:
             yield neighbor
@@ -46,7 +47,7 @@ class Algorithm:
             current = came_from[current]
             yield current
     
-    def astar(maze, start: tuple, end: tuple) -> tuple() or None:
+    def astar(maze, start: tuple, end: tuple, diagonal: bool) -> tuple() or None:
         """Returns a list of tuples as a path from the given start to the given end in the given maze"""
         
         count = 0
@@ -68,7 +69,7 @@ class Algorithm:
             if current == end:
                 yield (came_from, end)
             
-            for neighbor in Algorithm.neighbors(maze, current):
+            for neighbor in Algorithm.neighbors(maze, current, diagonal):
                 temp_g_score = g_score[current] + 1
 
                 if temp_g_score < g_score[neighbor]:

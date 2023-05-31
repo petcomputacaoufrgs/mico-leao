@@ -36,19 +36,21 @@ class interface:
             self.start = (-1, -1) # start position
             self.end = (-1, -1) # end position
             
+        self.diagonal = True
         self.colors = colors
         self.time: float = 0.1 # time between each step
         buttons:list = [[sg.Button('', key= (i, j), button_color=self.colors[self.maze[j][i]]) for i in range(self.width)] for j in range(self.height)] # create list of lists of buttons
         buttons.append([
-            sg.Button('Exit', button_color=('white', 'black'), key='Exit'),
-            sg.Button('Run', button_color=('white', 'black'), key='Run'),
-            sg.Button('Clear', button_color=('white', 'black'), key='Clear'),
-            sg.Button('Save', button_color=('white', 'black'), key='Save'),
-            sg.Button('Path', button_color=(self.colors[0]), key='Path'),
-            sg.Button('Wall', button_color=(self.colors[1]), key='Wall'),
-            sg.Button('Start', button_color=(self.colors[2]), key='Start'),
-            sg.Button('End', button_color=(self.colors[3]), key='End'),
-            sg.Slider(range=(0, 1), key='Time', orientation='horizontal', default_value=0.1, resolution=0.01, size=(10, 20))
+            sg.Button('Exit', button_color=('white', 'black'), key='Exit', size=(5, 2)),
+            sg.Button('Run', button_color=('white', 'black'), key='Run', size=(5, 2)),
+            sg.Button('Clear', button_color=('white', 'black'), key='Clear', size=(5, 2)),
+            sg.Button('Save', button_color=('white', 'black'), key='Save', size=(5, 2)),
+            sg.Button('Path', button_color=(self.colors[0]), key='Path', size=(5, 2)),
+            sg.Button('Wall', button_color=(self.colors[1]), key='Wall', size=(5, 2)),
+            sg.Button('Start', button_color=(self.colors[2]), key='Start', size=(5, 2)),
+            sg.Button('End', button_color=(self.colors[3]), key='End', size=(5, 2)),
+            sg.Slider(range=(0, 1), key='Time', orientation='horizontal', default_value=0.1, resolution=0.01, size=(10, 20)),
+            sg.Button(f'Diagonal', button_color=self.colors[2], key='Diagonal', size=(6, 2)) # add options button
             ]) # add options button
 
         self.window = sg.Window('A Star', buttons, # create window
@@ -165,10 +167,13 @@ class interface:
                     self.save(name)
             if event in ['Path', 'Wall', 'Start', 'End']:
                 option = event
+            if event == 'Diagonal':
+                self.diagonal = not self.diagonal
+                self.window[event].update(button_color = self.colors[2 if self.diagonal else 6])
             
     def map_viewer(self, maze, start: tuple, end: tuple) -> None:
         path = None
-        for node in alg.astar(maze, start, end): # run algorithm
+        for node in alg.astar(maze, start, end, self.diagonal): # run algorithm
             if node == None:
                 break
             if node[1] == end:
@@ -186,7 +191,7 @@ class interface:
                         exit()
                     if event == sg.TIMEOUT_KEY: # if 1 second has passed
                         break    
-                    if event is "Clear":
+                    if event == "Clear":
                         self.clear()
                         return
                     if event == 'Save':
@@ -207,7 +212,7 @@ class interface:
                         exit()
                     if event is sg.TIMEOUT_KEY: # if 1 second has passed
                         break  
-                    if event is "Clear":
+                    if event == "Clear":
                         self.clear()
                         return
                     if event == 'Save':
@@ -227,7 +232,7 @@ class interface:
             if event in (sg.WIN_CLOSED, 'Exit'):  # if the X button clicked, just exit
                 self.window.close() # close window
                 exit()
-            if event is "Clear":
+            if event == "Clear":
                     self.clear()
                     return
             if event == 'Save':
