@@ -1,5 +1,6 @@
 from PySide6 import QtCore, QtWidgets, QtGui
 import minimax
+import graphviz
 
 ### Main window class, coordinates other classes
 class MainWindow(QtWidgets.QWidget): 
@@ -161,7 +162,7 @@ class GameWindow(QtWidgets.QWidget):
         index = self.buttons.get(button)
         
         ### Checking if move is valid
-        self.logic.registerPlayerMove(button, index)
+        self.logic.registerPlayerMove(index)
 
         self.updateBoard()
         
@@ -176,7 +177,7 @@ class GameWindow(QtWidgets.QWidget):
         if score != None:
             self.parentWidget().endScreen(score)
         
-### Class coordinates game logic (from minimax.py)
+### Class coordinates game logic
 class GameLogic:
     
     def __init__(self):
@@ -185,9 +186,11 @@ class GameLogic:
         self.gameState = minimax.Board()
         ### AI class from minimax.py
         self.ai = minimax.AIPlayer(self.gameState.PLAYER2)
+        
+        self.treeGraph = DecisionTreeGraph()
     
     ### Will register move if its a valid move           
-    def registerPlayerMove(self, button, index): 
+    def registerPlayerMove(self, index): 
          
         if self.gameState.isValidMove(index): 
             
@@ -195,8 +198,59 @@ class GameLogic:
             
             if self.ai.gameTree is not None:
                 self.ai.updateTreeRoot(self.gameState)
+                self.treeGraph.drawTreeNode(self.ai.gameTree)
             
             self.getAIMove()
                    
     def getAIMove(self):
         self.gameState = self.ai.makePlay(self.gameState)
+        self.treeGraph.drawTreeNode(self.ai.gameTree)
+        self.treeGraph.graph.render("tree", view=False)
+
+class DecisionTreeGraph(QtWidgets.QWidget):
+    
+    def __init__(self):
+        super().__init__()
+        
+        self.graph = graphviz.Digraph('G', filename='hello.gv')
+        
+        self.graph.attr('node', shape='box', style='filled', color='lightgrey')
+
+        self.graph.format = "png"
+        self.graph.render("tree", view=False)
+    
+    def spaceToTab(self, board):
+        
+        result = board.copy()    
+        for i in range(9):
+            if result[i] == " ":
+                result[i] = "   "
+        return result
+        
+    def drawTreeNode(self, curNode):
+        
+        current_board = self.spaceToTab(curNode.gameBoard.gameBoard)
+             
+        for child in curNode.children:
+            
+            child_board = self.spaceToTab(child.gameBoard.gameBoard)
+            self.graph.edge("""
+{} || {} || {}
+=========
+{} || {} || {}
+=========
+{} || {} || {}
+            """.format(*current_board), """
+{} || {} || {}
+=========
+{} || {} || {}
+=========
+{} || {} || {}
+            """.format(*child_board)) 
+            
+            #self.graph.render("tree", view=False)
+            
+    
+
+        
+    
