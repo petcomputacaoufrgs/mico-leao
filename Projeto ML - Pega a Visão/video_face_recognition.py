@@ -46,19 +46,13 @@ def people_unknown_video(people_encoding):
     print('Terminou o encoding das pessoas conhecidas')
 
     cap = cv.VideoCapture(0)
-    reconheceu = False
-    nome = 'Pessoa'
-    cor = (255,255,255)
+    fps = 3
+    pessoas_conhecidas = []
 
     while True:
         success, frame = cap.read()
         imgGRAY = cv.cvtColor(frame,cv.COLOR_BGR2GRAY)
-        detect_faces = haar_cascade.detectMultiScale(imgGRAY, scaleFactor=1.1, minNeighbors=15)
-
-        if len(detect_faces) == 0:
-            reconheceu = False
-            nome = 'Pessoa'
-            cor = (255,255,255)
+        detect_faces = haar_cascade.detectMultiScale(imgGRAY, scaleFactor=1.1, minNeighbors=6)
         
         
         for (x,y,w,h) in detect_faces:
@@ -66,35 +60,33 @@ def people_unknown_video(people_encoding):
             # região de interesse
             imgRGB = cv.cvtColor(frame,cv.COLOR_BGR2RGB)
             face_roi = frame[y:y+h, x:x+w]
+            cv.rectangle(frame, (x,y), (x+w, y+h), (255,255,255), thickness=2)
             
-           
-            if not reconheceu:
+            if (fps%3 == 0):
                 try:
                     # encoding só da roi
                     unknown_encoding = face_recognition.face_encodings(imgRGB)[0]
-                    desconhecido = True
 
                     for person in people_encoding:
                         results = face_recognition.compare_faces([people_encoding[person]], unknown_encoding)
                         if results[0]:
                             nome = person
-                            cor = (0,255,0)
-                            reconheceu = True
-                            desconhecido = False 
-                    if desconhecido:
-                        nome = 'Pessoa Desconhecida'
-                        cor = (0,0,255)
-                        reconheceu = True
-                    
+                            cv.putText(frame, nome, (x, y+h+25), cv.FONT_HERSHEY_COMPLEX, 1.0, (0,255,0), thickness=2)
+
                 except:
                     print('Não há pessoas')
                 
-            cv.rectangle(frame, (x,y), (x+w, y+h), cor, thickness=2)
-            cv.putText(frame, nome, (x, y+h+25), cv.FONT_HERSHEY_COMPLEX, 1.0, cor, thickness=2)
+                fps = 0
         
         # Mostrando o vídeo da WebCan
         
+        fps+=1
+
         cv.imshow("CAM", frame)
         if cv.waitKey(1) & 0xFF == ord('d'):
             break
+
+    cap.release()
+    cv.destroyallWindows()
+    cv.waitKey(0)
 
