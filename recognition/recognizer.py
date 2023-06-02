@@ -119,9 +119,9 @@ if __name__ == "__main__":
                 reference = reference.unsqueeze(0)
                 
                 out1, out2 = model(face, reference)
-                dissimilarity = contrastiveLoss(out1, out2, 0)
+                dist_sq = contrastiveLoss(out1, out2, 1)
                 print(f"Face {i}:")
-                print(f"\tDISSIMILARITY SCORE: {dissimilarity}")
+                print(f"\tDISSIMILARITY SCORE: {dist_sq}")
 
         if key == ord('q'):
             cv.destroyAllWindows()
