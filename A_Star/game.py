@@ -1,10 +1,12 @@
+INITIALPATH = ""
+TOTALHEIGHT = 18
+TOTALWIDTH = 27
+
 import PySimpleGUI as sg
 from algorithm import Algorithm as alg
 from images import PETLOGO, NOPATH
 from math import ceil, floor
 
-TOTALHEIGHT = 18
-TOTALWIDTH = 32
 
 class interface:
     def __init__(self, colors: list):
@@ -70,13 +72,13 @@ class interface:
                 self.clear()
                 return
             if event == 'Save':
-                name = sg.popup_get_file('Save', save_as=True, file_types=(("Astar files", "*.astr"),), keep_on_top=True)
+                name = sg.popup_get_file('Save', save_as=True, file_types=(("Astar files", "*.astr"),), keep_on_top=True, default_path=INITIALPATH, initial_folder=INITIALPATH)
                 if name != None:
                     self.maze[self.start[1]][self.start[0]] = 2 # set to 0
                     self.maze[self.end[1]][self.end[0]] = 3 # set to 0
                     self.save(name)
             if event == "Load":
-                name = sg.popup_get_file("Load", file_types=(("Astar files", "*.astr"),), keep_on_top=True)
+                name = sg.popup_get_file("Load", file_types=(("Astar files", "*.astr"),), keep_on_top=True, default_path=INITIALPATH, initial_folder=INITIALPATH)
                 if name != None:
                     self.load(name)
                     return
@@ -203,13 +205,13 @@ class interface:
                         self.clear()  
                     
                     if event == 'Save':
-                        name = sg.popup_get_file('Save', save_as=True, file_types=(("Astar files", "*.astr"),), keep_on_top=True)
+                        name = sg.popup_get_file('Save', save_as=True, file_types=(("Astar files", "*.astr"),), keep_on_top=True, default_path=INITIALPATH, initial_folder=INITIALPATH)
                         if name != None:
                             self.maze[self.start[1]][self.start[0]] = 2 # set to 0
                             self.maze[self.end[1]][self.end[0]] = 3 # set to 0
                             self.save(name)
                     if event == "Load":
-                        name = sg.popup_get_file("Load", file_types=(("Astar files", "*.astr"),), keep_on_top=True)
+                        name = sg.popup_get_file("Load", file_types=(("Astar files", "*.astr"),), keep_on_top=True, default_path=INITIALPATH, initial_folder=INITIALPATH)
                         if name != None:
                             self.load(name)
                             jump = True
@@ -289,7 +291,7 @@ class interface:
                             self.clear()
                             return
                         if event == 'Save':
-                            name = sg.popup_get_file('Save', save_as=True, file_types=(("Astar files", "*.astr"),), keep_on_top=True)
+                            name = sg.popup_get_file('Save', save_as=True, file_types=(("Astar files", "*.astr"),), keep_on_top=True, default_path=INITIALPATH, initial_folder=INITIALPATH)
                             if name != None:
                                 self.maze[self.start[1]][self.start[0]] = 2 # set to 0
                                 self.maze[self.end[1]][self.end[0]] = 3 # set to 0
@@ -318,13 +320,13 @@ class interface:
                     self.clear()
                     break
                 if event == 'Save':
-                    name = sg.popup_get_file('Save', save_as=True, file_types=(("Astar files", "*.astr"),), keep_on_top=True)
+                    name = sg.popup_get_file('Save', save_as=True, file_types=(("Astar files", "*.astr"),), keep_on_top=True, default_path=INITIALPATH, initial_folder=INITIALPATH)
                     if name != None:
                         self.maze[self.start[1]][self.start[0]] = 2 # set to 0
                         self.maze[self.end[1]][self.end[0]] = 3 # set to 0
                         self.save(name)
                 if event == "Load":
-                    name = sg.popup_get_file("Load", file_types=(("Astar files", "*.astr"),), keep_on_top=True)
+                    name = sg.popup_get_file("Load", file_types=(("Astar files", "*.astr"),), keep_on_top=True, default_path=INITIALPATH, initial_folder=INITIALPATH)
                     if name != None:
                         self.load(name)
                         break

@@ -1,3 +1,7 @@
+INITIALPATH = ""
+TOTALHEIGHT = 18
+TOTALWIDTH = 27 - 1 # mismatch betwen game and slides
+
 import PySimpleGUI as sg
 import os
 from os import walk, listdir
@@ -60,10 +64,6 @@ def splash():
     sg.popup_no_buttons(title="Sem Caminho", image=NOPATH, non_blocking=True, keep_on_top=True, no_titlebar=True, auto_close=True, auto_close_duration=4)
 
 if __name__ == '__main__': 
-
-    PATH = "C:/Users/kersz/Documents/ufrgs/PET/mico-leao/maps"
-    TOTALHEIGHT = 18
-    TOTALWIDTH = 32
     colors = ['grey', 'black', "green", "blue", "yellow", "#283b5b", "red"]
     window = createWindow(colors)
     window.bind("<Return>", "_Enter")
@@ -71,9 +71,9 @@ if __name__ == '__main__':
     while True:
         # window.maximize()
         wait(window, 0.1)
-        os.chdir(PATH)
-        files = filter(os.path.isfile, listdir(PATH))
-        files = [os.path.join(PATH, f) for f in files] # add path to each file
+        os.chdir(INITIALPATH)
+        files = filter(os.path.isfile, listdir(INITIALPATH))
+        files = [os.path.join(INITIALPATH, f) for f in files] # add path to each file
         
         files.sort(key=lambda x: os.path.getmtime(x), reverse=True)
         
@@ -90,7 +90,7 @@ if __name__ == '__main__':
             
             time = 0.3
             window['Diagonal'].update(button_color='green' if diagonal else 'red')
-            window['Title'].update(value="Labirinto de " + file[len(PATH) + 1:-5])
+            window['Title'].update(value="Labirinto de " + file[len(INITIALPATH) + 1:-5])
             
             for i, posY in enumerate(range(int(TOTALHEIGHT/2 - floor(height/2)) - 1, int(TOTALHEIGHT/2 + ceil(height/2)) - 1)) if height < TOTALHEIGHT else enumerate(range(TOTALHEIGHT)):
                 for j, posX in enumerate(range(int(TOTALWIDTH/2 - floor(width/2)) - 1 , int(TOTALWIDTH/2 + ceil(width/2) - 1))) if width < TOTALWIDTH else enumerate(range(TOTALWIDTH)):
