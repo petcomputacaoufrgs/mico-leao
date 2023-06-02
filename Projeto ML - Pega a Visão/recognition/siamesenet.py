@@ -21,9 +21,9 @@ class RecognizerNet(nn.Module):
 
         # Camadas utilizadas para aprender as relações entre faces
         self.linear_stack = nn.Sequential(
-            nn.Linear(576, 1000),
             nn.Sigmoid(),
-            nn.Linear(1000, 1000)
+            nn.Linear(576, 1000),
+            #nn.Linear(1000, 1000)
         )
 
     def forward_once(self, x):
@@ -38,7 +38,7 @@ class RecognizerNet(nn.Module):
     
 
 
-def contrastiveLoss(x1, x2, label, margin=2.0):
+def contrastiveLoss(x1, x2, label, margin=1.0):
     # Calcula similaridade
     x = nn.functional.pairwise_distance(x1, x2, keepdim=True) # Distância L2
     x = torch.mean((label) * torch.pow(x, 2) + (1 - label) * torch.pow(torch.clamp(margin - x, min=0), 2))
