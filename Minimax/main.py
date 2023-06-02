@@ -1,6 +1,6 @@
 import sys
 import gui
-from PySide6 import QtCore, QtWidgets, QtGui
+from PySide6 import QtWidgets
 
 
 if __name__ == "__main__":
