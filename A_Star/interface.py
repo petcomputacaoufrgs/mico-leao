@@ -4,7 +4,7 @@ from algorithm import Algorithm as alg
 def size() -> tuple():
     sizeWindow = sg.Window('A Star', 
                         [[sg.Slider(range=(0, 32), key='Sizex', orientation='horizontal', default_value=5, resolution=1, size=(10, 20)),
-                        sg.Slider(range=(0, 20), key='Sizey', orientation='horizontal', default_value=5, resolution=1, size=(10, 20))],
+                        sg.Slider(range=(0, 18), key='Sizey', orientation='horizontal', default_value=5, resolution=1, size=(10, 20))],
                         [sg.Button('Ok', button_color=('white', 'black'), key='Ok'), sg.Button('Load', button_color=('white', 'black'), key='Load')]], # create window
                         #  size=(600, 100), # set window size
                         resizable=True,
@@ -35,8 +35,8 @@ class interface:
             self.maze = [[0 for i in range(width)] for j in range(height)] # create maze with 0's
             self.start = (-1, -1) # start position
             self.end = (-1, -1) # end position
+            self.diagonal = True
             
-        self.diagonal = True
         self.colors = colors
         self.time: float = 0.1 # time between each step
         buttons:list = [[sg.Button('', key= (i, j), button_color=self.colors[self.maze[j][i]]) for i in range(self.width)] for j in range(self.height)] # create list of lists of buttons
@@ -50,7 +50,7 @@ class interface:
             sg.Button('Start', button_color=(self.colors[2]), key='Start', size=(5, 2)),
             sg.Button('End', button_color=(self.colors[3]), key='End', size=(5, 2)),
             sg.Slider(range=(0, 1), key='Time', orientation='horizontal', default_value=0.1, resolution=0.01, size=(10, 20)),
-            sg.Button(f'Diagonal', button_color=self.colors[2], key='Diagonal', size=(6, 2)) # add options button
+            sg.Button(f'Diagonal', button_color=self.colors[2 if self.diagonal else 6], key='Diagonal', size=(6, 2)) # add options button
             ]) # add options button
 
         self.window = sg.Window('A Star', buttons, # create window
@@ -66,6 +66,7 @@ class interface:
         name = name + ".astr" if place == -1 else name[:place] + ".astr"
         try:
             with open(name, "wb") as file:
+                file.write(self.diagonal.to_bytes(1, "big"))
                 file.write(self.height.to_bytes(2, "big"))
                 file.write(self.width.to_bytes(2, "big"))
                 file.write(self.start[0].to_bytes(2, "big"))
@@ -85,6 +86,7 @@ class interface:
         name = name + ".astr" if place == -1 else name[:place] + ".astr"
         try:
             with open(name, "rb") as file:
+                self.diagonal = bool.from_bytes(file.read(1), "big")
                 self.height = int.from_bytes(file.read(2), "big")
                 self.width = int.from_bytes(file.read(2), "big")
                 self.start = (int.from_bytes(file.read(2), "big"), int.from_bytes(file.read(2), "big"))

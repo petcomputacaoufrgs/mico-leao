@@ -13,23 +13,23 @@ class Algorithm:
         x, y = current
         neighbors = []
 
-        if x > 0 and maze[y][x - 1] == 0: # UP
+        if x > 0 and maze[y][x - 1] != 1: # UP
             neighbors.append((x - 1, y))
-        if x < len(maze[0]) - 1 and maze[y][x + 1] == 0: # DOWN
+        if x < len(maze[0]) - 1 and maze[y][x + 1] != 1: # DOWN
             neighbors.append((x + 1, y))
-        if y > 0 and maze[y - 1][x] == 0: # LEFT
+        if y > 0 and maze[y - 1][x] != 1: # LEFT
             neighbors.append((x, y - 1))
-        if y < len(maze) - 1 and maze[y + 1][x] == 0: # RIGHT
+        if y < len(maze) - 1 and maze[y + 1][x] != 1: # RIGHT
             neighbors.append((x, y + 1))
 
         if diagonal:
-            if x > 0 and y > 0 and maze[y - 1][x - 1] == 0: # UP-left
+            if x > 0 and y > 0 and maze[y - 1][x - 1] != 1: # UP-left
                 neighbors.append((x - 1, y - 1))
-            if x > 0 and y < len(maze) - 1 and maze[y + 1][x - 1] == 0: # UP-right
+            if x > 0 and y < len(maze) - 1 and maze[y + 1][x - 1] != 1: # UP-right
                 neighbors.append((x - 1, y + 1))
-            if x < len(maze[0]) - 1 and y > 0 and maze[y - 1][x + 1] == 0: # DOWN-left
+            if x < len(maze[0]) - 1 and y > 0 and maze[y - 1][x + 1] != 1: # DOWN-left
                 neighbors.append((x + 1, y - 1))
-            if x < len(maze[0]) - 1 and y < len(maze) - 1 and maze[y + 1][x + 1] == 0: # DOWN-right
+            if x < len(maze[0]) - 1 and y < len(maze) - 1 and maze[y + 1][x + 1] != 1: # DOWN-right
                 neighbors.append((x + 1, y + 1))
 
         for neighbor in neighbors:
