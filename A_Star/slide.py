@@ -57,7 +57,7 @@ def clearScreen(window: sg.Window, height: int, width: int) -> None:
             window[(j, i)].update(button_color='#64778d')
             
 def splash():
-    sg.popup_no_buttons(title="Sem Caminho", image=NOPATH, non_blocking=True, no_titlebar=True, auto_close=True, auto_close_duration=4)
+    sg.popup_no_buttons(title="Sem Caminho", image=NOPATH, non_blocking=True, keep_on_top=True, no_titlebar=True, auto_close=True, auto_close_duration=4)
 
 if __name__ == '__main__': 
 

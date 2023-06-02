@@ -47,7 +47,7 @@ class interface:
                         grab_anywhere=False,
                         size=(1920, 1080),
                         location=(0, 0),
-                        # keep_on_top=True,
+                        keep_on_top=True,
                         return_keyboard_events=True,
                         no_titlebar=True,
                         element_justification='center', finalize=True) # set element justification to center
@@ -70,19 +70,19 @@ class interface:
                 self.clear()
                 return
             if event == 'Save':
-                name = sg.popup_get_file('Save', save_as=True, file_types=(("Astar files", "*.astr"),))
+                name = sg.popup_get_file('Save', save_as=True, file_types=(("Astar files", "*.astr"),), keep_on_top=True)
                 if name != None:
                     self.maze[self.start[1]][self.start[0]] = 2 # set to 0
                     self.maze[self.end[1]][self.end[0]] = 3 # set to 0
                     self.save(name)
             if event == "Load":
-                name = sg.popup_get_file("Load", file_types=(("Astar files", "*.astr"),))
+                name = sg.popup_get_file("Load", file_types=(("Astar files", "*.astr"),), keep_on_top=True)
                 if name != None:
                     self.load(name)
                     return
     
     def Error():
-        sg.popup_no_buttons(title="Sem Caminho", image=NOPATH, non_blocking=True, no_titlebar=True, auto_close=True, auto_close_duration=4)
+        sg.popup_no_buttons(title="Sem Caminho", image=NOPATH, non_blocking=True, keep_on_top=True, no_titlebar=True, auto_close=True, auto_close_duration=4)
     
     def save(self, name: str) -> bool:
         place = name.rfind(".")
@@ -209,13 +209,13 @@ class interface:
                         self.clear()  
                     
                     if event == 'Save':
-                        name = sg.popup_get_file('Save', save_as=True, file_types=(("Astar files", "*.astr"),))
+                        name = sg.popup_get_file('Save', save_as=True, file_types=(("Astar files", "*.astr"),), keep_on_top=True)
                         if name != None:
                             self.maze[self.start[1]][self.start[0]] = 2 # set to 0
                             self.maze[self.end[1]][self.end[0]] = 3 # set to 0
                             self.save(name)
                     if event == "Load":
-                        name = sg.popup_get_file("Load", file_types=(("Astar files", "*.astr"),))
+                        name = sg.popup_get_file("Load", file_types=(("Astar files", "*.astr"),), keep_on_top=True)
                         if name != None:
                             self.load(name)
                             jump = True
@@ -295,7 +295,7 @@ class interface:
                             self.clear()
                             return
                         if event == 'Save':
-                            name = sg.popup_get_file('Save', save_as=True, file_types=(("Astar files", "*.astr"),))
+                            name = sg.popup_get_file('Save', save_as=True, file_types=(("Astar files", "*.astr"),), keep_on_top=True)
                             if name != None:
                                 self.maze[self.start[1]][self.start[0]] = 2 # set to 0
                                 self.maze[self.end[1]][self.end[0]] = 3 # set to 0
@@ -324,13 +324,13 @@ class interface:
                     self.clear()
                     break
                 if event == 'Save':
-                    name = sg.popup_get_file('Save', save_as=True, file_types=(("Astar files", "*.astr"),))
+                    name = sg.popup_get_file('Save', save_as=True, file_types=(("Astar files", "*.astr"),), keep_on_top=True)
                     if name != None:
                         self.maze[self.start[1]][self.start[0]] = 2 # set to 0
                         self.maze[self.end[1]][self.end[0]] = 3 # set to 0
                         self.save(name)
                 if event == "Load":
-                    name = sg.popup_get_file("Load", file_types=(("Astar files", "*.astr"),))
+                    name = sg.popup_get_file("Load", file_types=(("Astar files", "*.astr"),), keep_on_top=True)
                     if name != None:
                         self.load(name)
                         break
