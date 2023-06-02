@@ -126,40 +126,34 @@ class interface:
     def update_maze(self, event: tuple, option: str) -> None:
         x, y = event[0], event[1]
 
-        match option:
-            case "Wall":
-                if self.end == (x, y):
-                    self.end = (-1, -1) # set end to "null"
-                if self.start == (x, y):
-                    self.start = (-1, -1) # set start to "null"
-                self.maze[y][x] = 1 # set to wall
-
-            case "Start":
-                if self.end == (x, y):
-                    self.end = (-1, -1) # set end to "null"
-                if self.start != (-1, -1): # if start is not "null"
-                    self.window[self.start].update(button_color = self.colors[0]) # update button color
-                    self.maze[self.start[1]][self.start[0]] = 0 # set to 0
-                self.start = (x, y) # set start to current position
-                self.maze[y][x] = 2 # set to start
-
-            case "End":
-                if self.start == (x, y):
-                    self.start = (-1, -1) # set start to "null"
-                if self.end != (-1, -1): # if end is not "null"
-                    self.window[self.end].update(button_color = self.colors[0]) # update button color
-                    self.maze[self.end[1]][self.end[0]] = 0 # set to 0
-                self.end = (x, y) # set end to current position
-                self.maze[y][x] = 3 # set to end
-
-            case "Path":
-                if self.end == (x, y):
-                    self.end = (-1, -1) # set end to "null"
-                if self.start == (x, y):
-                    self.start = (-1, -1) # set start to "null"
-                self.maze[y][x] = 0 # set to 0
-
-        return
+        if option == "Wall":
+            if self.end == (x, y):
+                self.end = (-1, -1) # set end to "null"
+            if self.start == (x, y):
+                self.start = (-1, -1) # set start to "null"
+            self.maze[y][x] = 1 # set to wall
+        elif option == "Start":
+            if self.end == (x, y):
+                self.end = (-1, -1) # set end to "null"
+            if self.start != (-1, -1): # if start is not "null"
+                self.window[self.start].update(button_color = self.colors[0]) # update button color
+                self.maze[self.start[1]][self.start[0]] = 0 # set to 0
+            self.start = (x, y) # set start to current position
+            self.maze[y][x] = 2 # set to start
+        elif option == "End":
+            if self.start == (x, y):
+                self.start = (-1, -1) # set start to "null"
+            if self.end != (-1, -1): # if end is not "null"
+                self.window[self.end].update(button_color = self.colors[0]) # update button color
+                self.maze[self.end[1]][self.end[0]] = 0 # set to 0
+            self.end = (x, y) # set end to current position
+            self.maze[y][x] = 3 # set to end
+        elif option == "Path":
+            if self.end == (x, y):
+                self.end = (-1, -1) # set end to "null"
+            if self.start == (x, y):
+                self.start = (-1, -1) # set start to "null"
+            self.maze[y][x] = 0 # set to 0
     
     def map_maker(self) -> None:
         option = 'Path'
