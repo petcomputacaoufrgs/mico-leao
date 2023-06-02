@@ -18,17 +18,19 @@ class MainWindow(QtWidgets.QWidget):
     
     ### Menu of the game
     def launch(self):
+        self.closeExtraWindow()     
         self.deleteCurrentLayout() 
         self.curWindow = GameMenu(self)
         self.setCurrentLayout()
         
     ### Game started    
-    def startGame(self):
+    def startGame(self):        
         self.deleteCurrentLayout()          # Previous layout must be deleted to change to another layout
         self.curWindow = GameWindow(self)
         self.setCurrentLayout()
     
     def endScreen(self, score):
+        
         self.deleteCurrentLayout()
         self.curWindow = GameEnd(self, score)
         self.setCurrentLayout()
@@ -38,20 +40,21 @@ class MainWindow(QtWidgets.QWidget):
         self.curLayout = self.curWindow.getLayout()
         self.setLayout(self.curLayout)
     
-    ### TODO: find better way to delete current layout
-    """  Couldnt find another way to delete layout
-    Before entering this function, the parent of current layout is the main window
-    Apparently to change current layout to another layout every object inside layout must be deleted (i think?)
-    However, layout is not iterable, so a for loop wouldnt work
-    Basically here the current layout parent is set to a temporary object, so when the temporary object gets
-    deleted, there wont be any references to the widgets inside current layout and they all will be deleted""" 
-      
     def deleteCurrentLayout(self): 
         QtWidgets.QWidget().setLayout(self.curLayout)
        
     ### Close main window                      
     def closeWindow(self):
-        self.close() 
+        self.close()
+        
+    def closeEvent(self, event):
+        for window in QtWidgets.QApplication.topLevelWidgets():
+            window.close()
+            
+    def closeExtraWindow(self):
+        for window in QtWidgets.QApplication.topLevelWidgets():     
+            if window.windowTitle() == "Árvore de Decisão":
+                window.close()
 
 ### Coordinates menu of the game      
 class GameMenu(QtWidgets.QWidget):
@@ -112,6 +115,7 @@ class GameEnd(QtWidgets.QWidget):
         self.layout.addWidget(self.startButton)
         self.layout.addWidget(self.quitButton)
         
+        
     def getLayout(self):
         return self.layout
         
@@ -130,6 +134,9 @@ class GameWindow(QtWidgets.QWidget):
         
         ### Game layout
         self.layout = QtWidgets.QGridLayout(parent)
+        
+        self.tree = TreeWindow()
+        self.tree.show()
         
         ### Setting up the buttons
         for row in range(3):
@@ -172,10 +179,63 @@ class GameWindow(QtWidgets.QWidget):
             index = self.buttons.get(button)
             button.setText(self.logic.gameState.gameBoard[index])
         
+        self.tree.updateTreeImage()
+        
         score = self.logic.gameState.evaluateBoard()
         
         if score != None:
             self.parentWidget().endScreen(score)
+     
+class TreeWindow(QtWidgets.QWidget):
+    
+        
+    def __init__(self):
+        super().__init__()
+        
+        self.setGeometry(100, 100, 600, 600)
+        
+        self.setWindowTitle("Árvore de Decisão")
+        
+        self.setWindowFlag(QtCore.Qt.WindowCloseButtonHint, False)
+
+        self.view = QtWidgets.QGraphicsView(self)
+        
+        
+        self.scene = QtWidgets.QGraphicsScene(self)
+        self.view.setScene(self.scene)
+
+        # Create a QGraphicsPixmapItem to hold the image
+        self.image_item = QtWidgets.QGraphicsPixmapItem()
+        self.scene.addItem(self.image_item)
+
+        self.updateTreeImage()
+
+        # Enable dragging of the view
+        self.view.setDragMode(QtWidgets.QGraphicsView.ScrollHandDrag)
+        
+        # Set the layout
+        layout = QtWidgets.QVBoxLayout(self)
+        layout.addWidget(self.view)
+        
+
+    def updateTreeImage(self):
+        pixmap = QtGui.QPixmap("tree.png")
+        self.image_item.setPixmap(pixmap)
+        self.view.fitInView(self.image_item, QtCore.Qt.KeepAspectRatio)
+
+    def wheelEvent(self, event):
+        zoom_factor = 1.15 
+
+        if event.angleDelta().y() > 0:
+            # Zoom in
+            self.view.scale(zoom_factor, zoom_factor)
+        else:
+            # Zoom out
+            self.view.scale(1 / zoom_factor, 1 / zoom_factor)
+            
+        event.accept()
+        
+        
         
 ### Class coordinates game logic
 class GameLogic:
@@ -247,8 +307,6 @@ class DecisionTreeGraph(QtWidgets.QWidget):
 =========
 {} || {} || {}
             """.format(*child_board)) 
-            
-            #self.graph.render("tree", view=False)
             
     
 
