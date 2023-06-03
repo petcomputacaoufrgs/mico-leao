@@ -2,6 +2,7 @@ from PySide6 import QtCore, QtWidgets, QtGui
 import minimax
 import graphviz
 
+
 ### Main window class, coordinates other classes
 class MainWindow(QtWidgets.QWidget): 
     
@@ -13,18 +14,26 @@ class MainWindow(QtWidgets.QWidget):
         ### Current window and current layout
         self.curWindow = None
         self.curLayout = None
+        
+        screen = QtWidgets.QApplication.primaryScreen()
+        available_geometry = screen.availableGeometry()
+        self.screenHeigth = available_geometry.height()
+        self.screenWidth = available_geometry.width()
     
     @QtCore.Slot()
     
     ### Menu of the game
     def launch(self):
+        self.resize(800, 600)
+        self.setGeometry((self.screenWidth - 800)/2, (self.screenHeigth - 600)/2, 800, 600)
         self.closeExtraWindow()     
         self.deleteCurrentLayout() 
         self.curWindow = GameMenu(self)
         self.setCurrentLayout()
         
     ### Game started    
-    def startGame(self):        
+    def startGame(self):  
+        self.setGeometry(self.screenWidth/2, 30, self.screenWidth/2, self.screenHeigth-30)      
         self.deleteCurrentLayout()          # Previous layout must be deleted to change to another layout
         self.curWindow = GameWindow(self)
         self.setCurrentLayout()
@@ -192,7 +201,7 @@ class TreeWindow(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
         
-        self.setGeometry(100, 100, 600, 600)
+        #self.setGeometry(0, 0, SCREEN_WIDTH/2, SCREEN_HEIGHT)
         
         self.setWindowTitle("Árvore de Decisão")
         
@@ -216,6 +225,12 @@ class TreeWindow(QtWidgets.QWidget):
         # Set the layout
         layout = QtWidgets.QVBoxLayout(self)
         layout.addWidget(self.view)
+        
+        screen = QtWidgets.QApplication.primaryScreen()
+        available_geometry = screen.availableGeometry()
+        screenHeigth = available_geometry.height()
+        screenWidth = available_geometry.width()
+        self.setGeometry(0, 30, screenWidth/2, screenHeigth-30)
         
 
     def updateTreeImage(self):
@@ -287,9 +302,17 @@ class DecisionTreeGraph(QtWidgets.QWidget):
                 result[i] = "   "
         return result
         
-    def drawTreeNode(self, curNode):
-        
+    def drawTreeNode(self, curNode):        
+            
         current_board = self.spaceToTab(curNode.gameBoard.gameBoard)
+
+        self.graph.node("""
+{} || {} || {}
+=========
+{} || {} || {}
+=========
+{} || {} || {}
+            """.format(*current_board), fillcolor='lightblue')
              
         for child in curNode.children:
             
@@ -306,8 +329,7 @@ class DecisionTreeGraph(QtWidgets.QWidget):
 {} || {} || {}
 =========
 {} || {} || {}
-            """.format(*child_board)) 
-            
+            """.format(*child_board))
     
 
         
