@@ -8,7 +8,7 @@ from nltk.stem.porter import PorterStemmer
 import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, confusion_matrix, ConfusionMatrixDisplay
+from sklearn.metrics import accuracy_score, ConfusionMatrixDisplay
 from sklearn.naive_bayes import MultinomialNB
 
 CSV_FILE_NAME = 'spam_or_not_spam.csv'
@@ -27,17 +27,16 @@ NUMBER_OF_EPOCHS = 30
 
 CERTAINTY_THRESHOLD = 0.5
 
-def plot_graphs(history, string):
-    plt.plot(history.history[string])
-    plt.plot(history.history['val_' + string])
-    plt.xlabel("Epochs")
-    plt.ylabel(string)
-    plt.legend([string, 'val_' + string])
-    plt.show()
-
 if __name__ == '__main__':
+    # Não exibe mensagem de aviso do TensorFlow
+    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+
+    print('Lendo arquivo CSV')
+
     file_path = os.path.join(os.path.dirname(__file__), CSV_FILE_NAME)
     df = pd.read_csv(file_path)
+
+    print('Processando conjunto de dados')
 
     df = df.drop_duplicates().dropna()
 
@@ -79,14 +78,21 @@ if __name__ == '__main__':
     X_val = vectorizer.transform(X_val)
     X_test = vectorizer.transform(X_test)
 
+    print('Aplicando Naive Bayes')
+
     classifier = MultinomialNB()
     classifier.fit(X_train, y_train)
 
+    print('Realizando testes')
+
     y_pred = classifier.predict(X_test)
 
+    print('Resultados dos testes')
     print('Acurácia: ', accuracy_score(y_test, y_pred))
     
-    cm = confusion_matrix(y_test, y_pred)
-    disp = ConfusionMatrixDisplay(confusion_matrix=cm)
-    disp.plot()
+    disp = ConfusionMatrixDisplay.from_predictions(y_true=y_test, y_pred=y_pred)
+    disp.ax_.set_title('Matriz de Confusão')
+    disp.ax_.set_xlabel('Classe Predita')
+    disp.ax_.set_ylabel('Classe Verdadeira')
+
     plt.show()

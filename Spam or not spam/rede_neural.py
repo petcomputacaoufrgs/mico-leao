@@ -11,7 +11,7 @@ from nltk.stem.porter import PorterStemmer
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, confusion_matrix, ConfusionMatrixDisplay
+from sklearn.metrics import accuracy_score, ConfusionMatrixDisplay
 import tensorflow as tf
 from tensorflow import keras
 
@@ -31,17 +31,16 @@ NUMBER_OF_EPOCHS = 30
 
 CERTAINTY_THRESHOLD = 0.5
 
-def plot_graphs(history, string):
-    plt.plot(history.history[string])
-    plt.plot(history.history['val_' + string])
-    plt.xlabel("Epochs")
-    plt.ylabel(string)
-    plt.legend([string, 'val_' + string])
-    plt.show()
-
 if __name__ == '__main__':
+    # Não exibe mensagem de aviso do TensorFlow
+    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+
+    print('Lendo arquivo CSV')
+
     file_path = os.path.join(os.path.dirname(__file__), CSV_FILE_NAME)
     df = pd.read_csv(file_path)
+
+    print('Processando conjunto de dados')
 
     df = df.drop_duplicates().dropna()
 
@@ -92,6 +91,8 @@ if __name__ == '__main__':
     X_test = tokenizer.texts_to_sequences(np.array(X_test))
     X_test = pad_sequences(X_test, padding=PAD_TYPE, truncating=TRUNC_TYPE, maxlen=max_length)
 
+    print('Compilando rede neural')
+
     model = keras.Sequential([
         keras.layers.Embedding(VOCAB_SIZE, EMBEDDING_DIM, input_length=max_length),
         keras.layers.GlobalAveragePooling1D(),
@@ -102,6 +103,8 @@ if __name__ == '__main__':
     model.compile(loss='binary_crossentropy',
                   optimizer=keras.optimizers.Adam(learning_rate=LEARNING_RATE),
                   metrics=[BinaryAccuracy()])
+    
+    print('Treinando rede neural')
 
     history = model.fit(X_train,
                         y_train,
@@ -109,13 +112,25 @@ if __name__ == '__main__':
                         epochs=NUMBER_OF_EPOCHS,
                         validation_data=(X_val, y_val))
     
-    plot_graphs(history, "binary_accuracy")
+    print()
+    print('Realizando testes')
 
-    y_pred = (model.predict(X_test) > CERTAINTY_THRESHOLD).astype("int32")
-
+    y_pred = (model.predict(X_test, verbose=1) > CERTAINTY_THRESHOLD).astype('int32')
+    
+    print()
+    print('Resultados dos testes')
     print('Acurácia: ', accuracy_score(y_test, y_pred))
 
-    cm = confusion_matrix(y_test, y_pred)
-    disp = ConfusionMatrixDisplay(confusion_matrix=cm)
-    disp.plot()
+    plt.plot(history.history['binary_accuracy'])
+    plt.plot(history.history['val_binary_accuracy'])
+    plt.title('Curva de Aprendizagem')
+    plt.xlabel('Épocas')
+    plt.ylabel('Acurácia')
+    plt.legend(['Conj. Treinamento', 'Conj. Validação'])
+
+    disp = ConfusionMatrixDisplay.from_predictions(y_true=y_test, y_pred=y_pred)
+    disp.ax_.set_title('Matriz de Confusão')
+    disp.ax_.set_xlabel('Classe Predita')
+    disp.ax_.set_ylabel('Classe Verdadeira')
+
     plt.show()
