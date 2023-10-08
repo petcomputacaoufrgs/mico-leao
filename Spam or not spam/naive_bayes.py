@@ -3,29 +3,25 @@ import re
 
 import matplotlib.pyplot as plt
 import nltk
+import numpy as np
 from nltk.corpus import stopwords
 from nltk.stem.porter import PorterStemmer
 import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, ConfusionMatrixDisplay
+from sklearn.model_selection import StratifiedKFold
+from sklearn.metrics import accuracy_score, confusion_matrix, ConfusionMatrixDisplay
 from sklearn.naive_bayes import MultinomialNB
 
 CSV_FILE_NAME = 'spam_or_not_spam.csv'
 EMAIL_COLUMN_NAME = 'email'
 LABEL_COLUMN_NAME = 'label'
 
+NUMBER_OF_FOLDS = 5
+
 VOCAB_SIZE = 10000
 TRUNC_TYPE = "post"
 PAD_TYPE = "post"
 OOV_TOK = "<OOV>"
-
-EMBEDDING_DIM = 16
-HIDDEN_LAYER_DIM = 24
-LEARNING_RATE = 0.001
-NUMBER_OF_EPOCHS = 30
-
-CERTAINTY_THRESHOLD = 0.5
 
 if __name__ == '__main__':
     # Não exibe mensagem de aviso do TensorFlow
@@ -54,45 +50,65 @@ if __name__ == '__main__':
     X = X.apply(lambda token_list: [stemmer.stem(token) for token in token_list])
     X = X.apply(lambda x: ' '.join(x))
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, stratify=y)
-    X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.2, stratify=y_train)
+    confusion_matrices = []
+    accuracies = []
+    stratified_kfold = StratifiedKFold(n_splits=NUMBER_OF_FOLDS, shuffle=True, random_state=42)
 
-    train_ham_count = len(y_train[y_train == 0])
-    train_spam_count = len(y_train[y_train == 1])
-    oversampling_factor = train_ham_count // train_spam_count
+    for i, (train_idx, val_idx) in enumerate(stratified_kfold.split(X, y)):
+        print(f'Treinando fold {i + 1}/{NUMBER_OF_FOLDS}')
 
-    train = pd.DataFrame({EMAIL_COLUMN_NAME: X_train,
-                          LABEL_COLUMN_NAME: y_train})
+        X_train, X_val = X.iloc[train_idx], X.iloc[val_idx]
+        y_train, y_val = y.iloc[train_idx], y.iloc[val_idx]
+
+        train_ham_count = len(y_train[y_train == 0])
+        train_spam_count = len(y_train[y_train == 1])
+        oversampling_factor = train_ham_count // train_spam_count
+
+        train = pd.DataFrame({EMAIL_COLUMN_NAME: X_train,
+                              LABEL_COLUMN_NAME: y_train})
     
-    train_ham = train[train[LABEL_COLUMN_NAME] == 0]
-    train_spam = train[train[LABEL_COLUMN_NAME] == 1].sample(n=train_spam_count * oversampling_factor,
-                                                             replace=True)
+        train_ham = train[train[LABEL_COLUMN_NAME] == 0]
+        train_spam = train[train[LABEL_COLUMN_NAME] == 1].sample(n=train_spam_count * oversampling_factor,
+                                                                 replace=True)
 
-    train = pd.concat([train_ham, train_spam])
+        train = pd.concat([train_ham, train_spam])
 
-    X_train = train[EMAIL_COLUMN_NAME]
-    y_train = train[LABEL_COLUMN_NAME]
+        X_train = train[EMAIL_COLUMN_NAME]
+        y_train = train[LABEL_COLUMN_NAME]
 
-    vectorizer = CountVectorizer()
-    X_train = vectorizer.fit_transform(X_train)
-    X_val = vectorizer.transform(X_val)
-    X_test = vectorizer.transform(X_test)
+        vectorizer = CountVectorizer()
+        X_train = vectorizer.fit_transform(X_train)
+        X_val = vectorizer.transform(X_val)
 
-    print('Aplicando Naive Bayes')
+        classifier = MultinomialNB()
+        classifier.fit(X_train, y_train)
 
-    classifier = MultinomialNB()
-    classifier.fit(X_train, y_train)
+        print(f'Realizando testes do fold {i + 1}/{NUMBER_OF_FOLDS}')
 
-    print('Realizando testes')
+        y_pred = classifier.predict(X_val)
 
-    y_pred = classifier.predict(X_test)
+        print('Calculando métricas')
+        confusion_matrices.append(confusion_matrix(y_val, y_pred))
+        accuracies.append(accuracy_score(y_val, y_pred))
 
     print('Resultados dos testes')
-    print('Acurácia: ', accuracy_score(y_test, y_pred))
-    
-    disp = ConfusionMatrixDisplay.from_predictions(y_true=y_test, y_pred=y_pred)
-    disp.ax_.set_title('Matriz de Confusão')
-    disp.ax_.set_xlabel('Classe Predita')
-    disp.ax_.set_ylabel('Classe Verdadeira')
+
+    for i, acc in enumerate(accuracies):
+        print(f'Acurácia do Teste {i + 1}: {acc}')
+    else:
+        print('Acurácia média: ', np.average(accuracies))
+
+    for i, cm in enumerate(confusion_matrices):
+        disp = ConfusionMatrixDisplay(cm)
+        disp.plot()
+        plt.title(f'Matriz de Confusão do Fold {i + 1}/{NUMBER_OF_FOLDS}')
+        plt.xlabel('Classe Predita')
+        plt.ylabel('Classe Verdadeira')
+    else:
+        disp = ConfusionMatrixDisplay(np.mean(confusion_matrices, axis=0))
+        disp.plot(values_format='.2f')
+        plt.title('Matriz de Confusão Média')
+        plt.xlabel('Classe Predita')
+        plt.ylabel('Classe Verdadeira')
 
     plt.show()
